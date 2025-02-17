@@ -1,14 +1,14 @@
 const { ObjectId } = require("mongodb");
-const { getDB } = require("../../models/forContacts");
+const { getDB } = require("../../models/forFavorites");
 
 const removeById = async (req, res) => {
-  const { id: contactId } = req.params;
+  const { id: favId } = req.params;
 
   try {
-    const contactsCollection = await getDB();
+    const favsCollection = await getDB();
 
-    const result = await contactsCollection.findOneAndDelete({
-      _id: new ObjectId(contactId),
+    const result = await favsCollection.findOneAndDelete({
+      _id: new ObjectId(favId),
     });
 
     if (!result) {
@@ -18,7 +18,7 @@ const removeById = async (req, res) => {
       message: "Delete successful",
     });
   } catch (error) {
-    console.error("Error fetching contact:", error); // Лог для помилки
+    console.error("Error fetching fav:", error); // Лог для помилки
     res.status(500).json({ message: error.message });
   }
 };

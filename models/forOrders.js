@@ -2,12 +2,10 @@ const Joi = require("joi");
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
-const { required } = require("joi/lib");
-
 const { DB_HOST } = process.env;
 const client = new MongoClient(DB_HOST);
 const dbName = "marevoData"; // ⚠️ Замініть на назву вашої БД
-const collectionName = "contacts"; // ⚠️ Назва колекції
+const collectionName = "orders"; // ⚠️ Назва колекції
 
 async function getDB() {
   if (!client.topology || !client.topology.isConnected()) {
@@ -15,16 +13,17 @@ async function getDB() {
   }
   return client.db(dbName).collection(collectionName);
 }
-const addSchema = Joi.object({
+
+const addOrdersSchema = Joi.object({
+  userID: Joi.string().required(),
   name: Joi.string().min(3).required(),
   phone: Joi.number().required(),
+  bouquetTite: Joi.string().required(),
+  bouquetPrice: Joi.number().required(),
+  bouquetImg: Joi.string().required(),
 });
-
-const schemas = {
-  addSchema,
-};
 
 module.exports = {
   getDB,
-  schemas,
+  schemas: { addOrdersSchema },
 };

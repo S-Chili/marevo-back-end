@@ -1,4 +1,4 @@
-const { Subscribe, schemas } = require("../../models/forSubscribes");
+const { getDB, schemas } = require("../../models/forSubscribes");
 
 const addSub = async (req, res, next) => {
   try {
@@ -7,7 +7,12 @@ const addSub = async (req, res, next) => {
       return res.status(400).json({ message: error.message });
     }
 
-    const result = await Subscribe.create({ email: req.body.email });
+    const db = await getDB();
+    const result = await db.insertOne({
+      email: req.body.email,
+      subscribedAt: new Date(),
+    });
+
     res.status(201).json(result);
   } catch (error) {
     next(error);

@@ -1,25 +1,42 @@
-const { User, schemas } = require("../../models/user");
+const { getDB, schemas } = require("../../models/user");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const { RequestError } = require("../../helpers");
+
+const { SECRET_KEY } = process.env;
 
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  const usersCollection = await getDB();
+  const user = await usersCollection.findOne({ email });
 
   if (!user) {
-    return res.status(401).json({ message: "Email or password are wrong" });
+    throw RequestError(401, "Invalid credentials");
   }
 
-  const passwordCompare = await bcrypt.compare(password, user.password);
-
-  if (!passwordCompare) {
-    return res.status(401).json({ message: "Email or password are wrong" });
+  const isValidPassword = await bcrypt.compare(password, user.password);
+  if (!isValidPassword) {
+    throw RequestError(401, "Invalid credentials");
   }
 
-  const token = "jnfgvnidufvni";
+  const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "24h" });
+  user.token = token;
 
-  console.log(req.body, token);
-  res.status(201).json(token);
+  // Лог токену перед оновленням в базі
+  console.log("Generated token:", token);
+
+  res.cookie("token", token, {
+    httpOnly: true, // Захист від XSS атак
+    secure: true, // Працює лише на HTTPS (локально можна `false`)
+    sameSite: "None", // Дозволяє CORS cookies
+  });
+
+  // Оновлення токену в базі
+  await usersCollection.updateOne({ _id: user._id }, { $set: { token } });
+
+  res.json({ token, user });
 };
 
 module.exports = login;

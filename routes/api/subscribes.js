@@ -6,7 +6,7 @@ const subsRouter = express.Router();
 
 //contactsRouter.get("/", ctrl.getAll);
 
-subsRouter.post("/subscribes", ctrl.addSub);
+subsRouter.post("/", ctrl.addSub);
 
 //subsRouter.post("/subscribes", addSub);
 

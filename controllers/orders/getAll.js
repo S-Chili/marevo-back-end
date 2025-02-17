@@ -1,12 +1,12 @@
-const { getDB } = require("../../models/forContacts");
+const { getDB } = require("../../models/forOrders");
 
 const getAll = async (req, res) => {
   try {
     // Підключення до колекції contacts
-    const contactsCollection = await getDB();
+    const ordersCollection = await getDB();
 
     // Отримання всіх контактів з колекції
-    const result = await contactsCollection.find().toArray();
+    const result = await ordersCollection.find().toArray();
 
     res.json(result);
   } catch (error) {
