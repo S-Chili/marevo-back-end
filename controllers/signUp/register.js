@@ -1,6 +1,7 @@
 const { getDB, schemas } = require("../../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../../sendEmail"); // Імпортуємо sendEmail
 
 const register = async (req, res, next) => {
   try {
@@ -44,7 +45,19 @@ const register = async (req, res, next) => {
       path: "/",
     });
 
-    console.log(req.body);
+    // Відправляємо вітальний email
+    try {
+      await sendEmail(
+        email,
+        "Welcome to Our Platform!",
+        `Hello ${firstName}, welcome to our platform!`,
+        `<h1>Hello ${firstName}, welcome!</h1><p>We're glad to have you here.</p>`
+      );
+      console.log(`✅ Email sent to ${email}`);
+    } catch (error) {
+      console.error("❌ Error sending email:", error.response?.body || error);
+    }
+
     res.status(201).json({
       _id: result.insertedId,
       firstName,
