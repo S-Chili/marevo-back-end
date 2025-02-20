@@ -12,7 +12,7 @@ const logout = async (req, res) => {
   res.clearCookie("token", {
     httpOnly: true, // Токен можна зчитати тільки через HTTP запити
     secure: process.env.NODE_ENV === "production", // Якщо ви в продакшн, то потрібно HTTPS
-    sameSite: "Strict", // Запобігає відправці cookies з інших сайтів
+    sameSite: "None", // Запобігає відправці cookies з інших сайтів
   });
 
   res.json({

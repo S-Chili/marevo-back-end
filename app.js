@@ -20,13 +20,12 @@ app.use(cookieParser());
 const formatsLogger = process.env.NODE_ENV === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
 
-// Enable CORS for all origins or configure as needed
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: "https://s-chili.github.io/", // Дозволяємо кореневий домен
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"], // Дозволяємо необхідні заголовки
-    methods: ["GET", "POST", "PATCH", "DELETE"], // Дозволені методи
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PATCH", "DELETE"],
   })
 );
 
