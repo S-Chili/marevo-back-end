@@ -22,7 +22,7 @@ app.use(logger(formatsLogger));
 
 app.use(
   cors({
-    origin: "*", // Дозволяємо всім (тільки для тесту!)
+    origin: "https://s-chili.github.io",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
