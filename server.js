@@ -2,7 +2,7 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const app = require("./app"); // Додаємо app
 require("dotenv").config();
 
-const { DB_HOST, PORT = 3000 } = process.env;
+const { DB_HOST, PORT = process.env.PORT || 3000 } = process.env;
 
 const client = new MongoClient(DB_HOST, {
   serverApi: {
