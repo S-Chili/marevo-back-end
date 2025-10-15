@@ -1,8 +1,10 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const app = require("./app"); // Додаємо app
+const app = require("./app");
 require("dotenv").config();
 
-const { DB_HOST, PORT = process.env.PORT || 3000 } = process.env;
+const { DB_HOST } = process.env;
+
+const PORT = process.env.PORT || 3000;
 
 const client = new MongoClient(DB_HOST, {
   serverApi: {
@@ -17,7 +19,6 @@ async function connectDB() {
     await client.connect();
     console.log("✅ Успішно підключено до MongoDB!");
 
-    // Перевіряємо статус підключення
     const admin = client.db().admin();
     const status = await admin.serverStatus();
     console.log(
@@ -34,7 +35,6 @@ async function connectDB() {
 
 connectDB();
 
-// Закриття підключення при завершенні процесу
 process.on("SIGINT", async () => {
   await client.close();
   console.log("🔌 Підключення до MongoDB закрито.");
