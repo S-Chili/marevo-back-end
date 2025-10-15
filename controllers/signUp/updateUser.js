@@ -1,10 +1,9 @@
 const { getDB, schemas } = require("../../models/user");
+const { ObjectId } = require("mongodb");
 
 const updateUser = async (req, res) => {
   try {
-    console.log("req.user:", req.user); // Додано для перевірки
-
-    if (!req.user) {
+    if (!req.user || !req.user._id) {
       return res.status(401).json({ message: "Unauthorized: No user data" });
     }
 
@@ -13,8 +12,7 @@ const updateUser = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const userId = req.user._id; // Отримуємо ID з токена
-
+    const userId = new ObjectId(req.user._id);
     const db = await getDB();
     const updatedUser = await db.findOneAndUpdate(
       { _id: userId },
@@ -22,11 +20,12 @@ const updateUser = async (req, res) => {
       { returnDocument: "after" }
     );
 
-    if (!updatedUser) {
+    if (!updatedUser.value) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ user: updatedUser });
+    // ✅ Return a consistent JSON object for success
+    res.json({ message: "User updated successfully", user: updatedUser.value });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }

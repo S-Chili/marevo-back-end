@@ -22,7 +22,7 @@ app.use(logger(formatsLogger));
 
 app.use(
   cors({
-    origin: "https://s-chili.github.io",
+    origin: "https://s-chili.github.io/marevo/",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PATCH", "DELETE"],

@@ -35,8 +35,10 @@ const updateUserSchema = Joi.object({
   dateOfBirth: Joi.string(), // або `.isoDate()` якщо ISO 8601
   country: Joi.string(),
   city: Joi.string(),
-  avatarUrl: Joi.object(),
-});
+  avatarUrl: Joi.string()
+    .regex(/^\/uploads\/.+/)
+    .allow(null, ""),
+}).min(1);
 
 const schemas = {
   registerSchema,

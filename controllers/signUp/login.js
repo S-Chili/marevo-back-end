@@ -28,9 +28,9 @@ const login = async (req, res) => {
   console.log("Generated token:", token);
 
   res.cookie("token", token, {
-    httpOnly: true, // Захист від XSS атак
-    secure: true, // Працює лише на HTTPS (локально можна `false`)
-    sameSite: "None", // Дозволяє CORS cookies
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   });
 
   // Оновлення токену в базі

@@ -1,7 +1,10 @@
 const { getDB, schemas } = require("../../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const sendEmail = require("../../sendEmail"); // Імпортуємо sendEmail
+const sendEmail = require("../../sendEmail");
+require("dotenv").config();
+
+const { SECRET_KEY } = process.env;
 
 const register = async (req, res, next) => {
   try {
@@ -13,20 +16,18 @@ const register = async (req, res, next) => {
 
     const { firstName, lastName, email, password } = req.body;
 
-    // Підключення до колекції users
     const usersCollection = await getDB();
 
-    // Перевірка на наявність користувача з таким email
+    // Перевірка, чи є користувач з таким email
     const user = await usersCollection.findOne({ email });
-
     if (user) {
       return res.status(409).json({ message: "Email in use" });
     }
 
-    // Хешуємо пароль перед збереженням
+    // Хешування пароля
     const hashPassword = await bcrypt.hash(password, 10);
 
-    // Додаємо нового користувача
+    // Додаємо користувача
     const result = await usersCollection.insertOne({
       firstName,
       lastName,
@@ -34,37 +35,36 @@ const register = async (req, res, next) => {
       password: hashPassword,
     });
 
-    const token = jwt.sign({ id: result.insertedId }, process.env.SECRET_KEY, {
+    const userId = result.insertedId.toString();
+
+    const token = jwt.sign({ id: result.insertedId.toString() }, SECRET_KEY, {
       expiresIn: "24h",
     });
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       path: "/",
     });
 
-    // Відправляємо вітальний email
+    // Відправка вітального email (не блокує реєстрацію при помилці)
     try {
-      await sendEmail(
-        email,
-        "Welcome to Our Platform!",
-        `Hello ${firstName}, welcome to our platform!`,
-        `<h1>Hello ${firstName}, welcome!</h1><p>We're glad to have you here.</p>`
-      );
+      await sendEmail(email, `Hello ${firstName}, welcome to our platform!`);
       console.log(`✅ Email sent to ${email}`);
-    } catch (error) {
-      console.error("❌ Error sending email:", error.response?.body || error);
+    } catch (err) {
+      console.error("❌ Error sending email:", err.response?.body || err);
     }
 
+    // Відповідь без токена (бо він у cookie)
     res.status(201).json({
-      _id: result.insertedId,
-      firstName,
-      lastName,
-      email,
-      message: "User registered and logged in",
-      token,
+      message: "User registered successfully",
+      user: {
+        _id: userId,
+        firstName,
+        lastName,
+        email,
+      },
     });
   } catch (error) {
     next(error);
